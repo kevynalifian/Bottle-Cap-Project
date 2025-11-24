@@ -41,6 +41,6 @@ known_third_party = ["cv2", "ultralytics", "wandb"]
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = "--strict-markers"
-testpaths = ["tests"]
+testpaths = ["Tests"]
 
 # [tool.pylint] (Pylint biasanya dikonfigurasi melalui .pylintrc atau CI)
