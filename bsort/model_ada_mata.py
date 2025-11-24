@@ -7,8 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1P2g3D0RnULMRVApVD4aRrEkLR4o99e8G
 """
 
-pip install ultralytics
-
 """# IMPORT LIBRARY"""
 
 import pandas as pd
@@ -34,14 +32,14 @@ from ultralytics import YOLO
 Menentukan batas atas dan batas bawah untuk hue, saturasi, dan value untuk membedakan kelas light blue, dark blue, dan others
 """
 
-DATASET_DIR = '/content/drive/MyDrive/sample'
+DATASET_DIR = "/content/drive/MyDrive/sample"
 IMAGE_DIR = DATASET_DIR
 LABEL_DIR = DATASET_DIR
-NEW_LABEL_DIR = os.path.join(DATASET_DIR, 'new_labels')
+NEW_LABEL_DIR = os.path.join(DATASET_DIR, "new_labels")
 os.makedirs(NEW_LABEL_DIR, exist_ok=True)
 
 HUE_LIGHT_BLUE_MIN, HUE_LIGHT_BLUE_MAX = 70, 110
-HUE_DARK_BLUE_MIN,  HUE_DARK_BLUE_MAX = 100, 130
+HUE_DARK_BLUE_MIN, HUE_DARK_BLUE_MAX = 100, 130
 
 SAT_MIN_FOR_COLOR = 40
 VAL_MIN_FOR_COLOR = 20
@@ -49,16 +47,22 @@ MIN_COLORED_PIXELS = 80
 
 """# FUNCTION untuk mendeteksi warna"""
 
-def shrink_roi(x1, y1, x2, y2, shrink_ratio=0.2): # Berguna sebagai croping sesuai dengan koordinat YOLO yang diberikan
+
+def shrink_roi(
+    x1, y1, x2, y2, shrink_ratio=0.2
+):  # Berguna sebagai croping sesuai dengan koordinat YOLO yang diberikan
     w = x2 - x1
     h = y2 - y1
     dx = int(w * shrink_ratio)
     dy = int(h * shrink_ratio)
     return x1 + dx, y1 + dy, x2 - dx, y2 - dy
 
-def detect_color_class(roi_bgr): # Berguna untuk mendeteksi warna sesuai nilai pikselnya
+
+def detect_color_class(
+    roi_bgr,
+):  # Berguna untuk mendeteksi warna sesuai nilai pikselnya
     hsv = cv2.cvtColor(roi_bgr, cv2.COLOR_BGR2HSV)
-    hue, sat, val = hsv[:,:,0], hsv[:,:,1], hsv[:,:,2]
+    hue, sat, val = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
 
     mask_colored = (sat > SAT_MIN_FOR_COLOR) & (val > VAL_MIN_FOR_COLOR)
     if np.sum(mask_colored) < MIN_COLORED_PIXELS:
@@ -72,7 +76,7 @@ def detect_color_class(roi_bgr): # Berguna untuk mendeteksi warna sesuai nilai p
     sat_med = np.median(sat)
     val_med = np.median(val)
 
-    is_blue = (HUE_LIGHT_BLUE_MIN <= hue_med <= HUE_DARK_BLUE_MAX)
+    is_blue = HUE_LIGHT_BLUE_MIN <= hue_med <= HUE_DARK_BLUE_MAX
     if not is_blue:
         return 2
 
@@ -80,6 +84,7 @@ def detect_color_class(roi_bgr): # Berguna untuk mendeteksi warna sesuai nilai p
         return 1
 
     return 0
+
 
 processed = 0
 counts = {0: 0, 1: 0, 2: 0}
@@ -108,8 +113,10 @@ for filename in os.listdir(LABEL_DIR):
                 x2 = int((cx + bw / 2) * w)
                 y2 = int((cy + bh / 2) * h)
 
-                x1 = max(0, x1); y1 = max(0, y1)
-                x2 = min(w - 1, x2); y2 = min(h - 1, y2)
+                x1 = max(0, x1)
+                y1 = max(0, y1)
+                x2 = min(w - 1, x2)
+                y2 = min(h - 1, y2)
                 sx1, sy1, sx2, sy2 = shrink_roi(x1, y1, x2, y2)
                 roi = img[sy1:sy2, sx1:sx2]
 
@@ -135,11 +142,11 @@ print(counts)
 """# Visualisasi proporsi kelas"""
 
 plt.figure(figsize=(10, 6))
-plt.bar(counts.keys(), counts.values(), color=['lightblue', 'darkblue', 'orange'])
-plt.xlabel('Class')
-plt.ylabel('Count')
-plt.title('Counts per Class')
-plt.xticks(range(3), ['Light Blue', 'Dark Blue', 'Others'])
+plt.bar(counts.keys(), counts.values(), color=["lightblue", "darkblue", "orange"])
+plt.xlabel("Class")
+plt.ylabel("Count")
+plt.title("Counts per Class")
+plt.xticks(range(3), ["Light Blue", "Dark Blue", "Others"])
 plt.show()
 
 """# Visualisasi proses labeling kembali"""
@@ -148,11 +155,12 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def detect_color_class(roi_hsv):
 
     color_ranges = {
         "Light Blue": [(85, 40, 40), (110, 255, 255)],
-        "Dark Blue":  [(100, 70, 20), (130, 255, 140)],
+        "Dark Blue": [(100, 70, 20), (130, 255, 140)],
     }
 
     max_pixels = 0
@@ -168,15 +176,14 @@ def detect_color_class(roi_hsv):
     return predicted
 
 
-
 def visualize_color_detection_process(img_path, boxes):
     img = cv2.imread(img_path)
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     color_ranges = {
         "Light Blue": [(85, 40, 40), (105, 255, 255)],
-        "Dark Blue":  [(100, 70, 20), (130, 255, 140)],
-        "Others": None
+        "Dark Blue": [(100, 70, 20), (130, 255, 140)],
+        "Others": None,
     }
 
     for i, (x1, y1, x2, y2) in enumerate(boxes):
@@ -202,19 +209,20 @@ def visualize_color_detection_process(img_path, boxes):
         axs[2].imshow(cv2.cvtColor(roi_hsv, cv2.COLOR_HSV2RGB))
         axs[2].set_title("HSV")
 
-        for a in axs: a.axis("off")
+        for a in axs:
+            a.axis("off")
         plt.show()
 
-        cv2.rectangle(img, (x1, y1), (x2, y2), (0,255,0), 2)
-        cv2.putText(img, label, (x1, y1 - 5),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0), 2)
+        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(
+            img, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2
+        )
 
     plt.figure(figsize=(8, 6))
     plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     plt.title("Final Classification Result")
     plt.axis("off")
     plt.show()
-
 
 
 def yolo_to_xyxy(box, img_w, img_h):
@@ -226,10 +234,11 @@ def yolo_to_xyxy(box, img_w, img_h):
     roi = img[y1:y2, x1:x2]
     hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
-    print("RGB/BGR sample pixel:", roi[0,0])  # Contoh satu piksel
-    print("HSV sample pixel:", hsv[0,0])
+    print("RGB/BGR sample pixel:", roi[0, 0])  # Contoh satu piksel
+    print("HSV sample pixel:", hsv[0, 0])
 
     return x1, y1, x2, y2
+
 
 img_path = "/content/drive/MyDrive/sample/raw-250110_dc_s001_b2_1.jpg"
 boxes = [
@@ -255,8 +264,8 @@ os.makedirs(PREVIEW_DIR, exist_ok=True)
 
 CLASS_MAP = {
     0: ("Light Blue", (255, 200, 0)),
-    1: ("Dark Blue",  (255, 0, 0)),
-    2: ("Others",     (0, 255, 255)),
+    1: ("Dark Blue", (255, 0, 0)),
+    2: ("Others", (0, 255, 255)),
 }
 
 valid_image_exts = [".jpg", ".jpeg", ".png", ".bmp"]
@@ -293,10 +302,10 @@ for file in os.listdir(LABEL_DIR):
         cls = int(cls)
         x, y, bw, bh = map(float, (x, y, bw, bh))
 
-        x1 = int((x - bw/2) * w)
-        y1 = int((y - bh/2) * h)
-        x2 = int((x + bw/2) * w)
-        y2 = int((y + bh/2) * h)
+        x1 = int((x - bw / 2) * w)
+        y1 = int((y - bh / 2) * h)
+        x2 = int((x + bw / 2) * w)
+        y2 = int((y + bh / 2) * h)
 
         x1, y1 = max(0, x1), max(0, y1)
         x2, y2 = min(w, x2), min(h, y2)
@@ -306,9 +315,16 @@ for file in os.listdir(LABEL_DIR):
         cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
 
         cv2.rectangle(img, (x1, y1 - 18), (x1 + 150, y1), color, -1)
-        cv2.putText(img, cls_name, (x1 + 4, y1 - 4),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                    (0, 0, 0), 1, cv2.LINE_AA)
+        cv2.putText(
+            img,
+            cls_name,
+            (x1 + 4, y1 - 4),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (0, 0, 0),
+            1,
+            cv2.LINE_AA,
+        )
 
     # simpan hasil
     out_path = os.path.join(PREVIEW_DIR, base + ".jpg")
@@ -339,6 +355,7 @@ VAL_RATIO = 0.1
 TEST_RATIO = 0.1
 RANDOM_SEED = 42
 
+
 def split_yolo_dataset_to_drive():
     if TRAIN_RATIO + VAL_RATIO + TEST_RATIO != 1.0:
         raise ValueError("Total rasio (Train + Val + Test) harus sama dengan 1.0")
@@ -350,7 +367,7 @@ def split_yolo_dataset_to_drive():
         print("Pastikan Google Drive Anda sudah terhubung dan path-nya benar.")
         return
 
-    image_files = [f for f in os.listdir(SOURCE_IMAGE_DIR) if f.endswith('.jpg')]
+    image_files = [f for f in os.listdir(SOURCE_IMAGE_DIR) if f.endswith(".jpg")]
     if not image_files:
         print(f"❌ Error: Tidak ada file .jpg yang ditemukan di {SOURCE_IMAGE_DIR}")
         return
@@ -358,29 +375,23 @@ def split_yolo_dataset_to_drive():
     print(f"✅ Ditemukan total {len(image_files)} gambar untuk diproses.")
 
     train_files, temp_files = train_test_split(
-        image_files,
-        test_size=VAL_RATIO + TEST_RATIO,
-        random_state=RANDOM_SEED
+        image_files, test_size=VAL_RATIO + TEST_RATIO, random_state=RANDOM_SEED
     )
     val_files, test_files = train_test_split(
         temp_files,
         test_size=TEST_RATIO / (VAL_RATIO + TEST_RATIO),
-        random_state=RANDOM_SEED
+        random_state=RANDOM_SEED,
     )
 
-    datasets = {
-        'train': train_files,
-        'val': val_files,
-        'test': test_files
-    }
+    datasets = {"train": train_files, "val": val_files, "test": test_files}
 
     print(f"🗑️ Membersihkan folder output lama di {BASE_OUTPUT_DIR}...")
     if os.path.exists(BASE_OUTPUT_DIR):
         shutil.rmtree(BASE_OUTPUT_DIR)
 
     for split in datasets.keys():
-        os.makedirs(os.path.join(BASE_OUTPUT_DIR, 'images', split), exist_ok=True)
-        os.makedirs(os.path.join(BASE_OUTPUT_DIR, 'labels', split), exist_ok=True)
+        os.makedirs(os.path.join(BASE_OUTPUT_DIR, "images", split), exist_ok=True)
+        os.makedirs(os.path.join(BASE_OUTPUT_DIR, "labels", split), exist_ok=True)
 
     print(f"📁 Struktur folder tujuan baru dibuat di Google Drive.")
     print("\n📦 Memulai penyalinan file ke Google Drive (mungkin perlu waktu)...")
@@ -392,26 +403,33 @@ def split_yolo_dataset_to_drive():
 
         for img_name in file_list:
             src_img_path = os.path.join(SOURCE_IMAGE_DIR, img_name)
-            dst_img_path = os.path.join(BASE_OUTPUT_DIR, 'images', split_name, img_name)
+            dst_img_path = os.path.join(BASE_OUTPUT_DIR, "images", split_name, img_name)
             shutil.copy(src_img_path, dst_img_path)
             image_count += 1
 
-            label_name = img_name.replace('.jpg', '.txt')
+            label_name = img_name.replace(".jpg", ".txt")
             src_label_path = os.path.join(SOURCE_LABEL_DIR, label_name)
-            dst_label_path = os.path.join(BASE_OUTPUT_DIR, 'labels', split_name, label_name)
+            dst_label_path = os.path.join(
+                BASE_OUTPUT_DIR, "labels", split_name, label_name
+            )
 
             if os.path.exists(src_label_path):
                 shutil.copy(src_label_path, dst_label_path)
                 label_count += 1
             else:
-                print(f"⚠️ Peringatan: Label tidak ditemukan untuk gambar {img_name}. File dilewati.")
+                print(
+                    f"⚠️ Peringatan: Label tidak ditemukan untuk gambar {img_name}. File dilewati."
+                )
                 os.remove(dst_img_path)
                 image_count -= 1
 
-        print(f"Selesai: {image_count} Gambar dan {label_count} Label disalin ke {split_name}.")
+        print(
+            f"Selesai: {image_count} Gambar dan {label_count} Label disalin ke {split_name}."
+        )
 
     print("\n🎉 Proses Pembagian Dataset Selesai dan Tersimpan di Google Drive!")
     print(f"Dataset siap untuk pelatihan di: {BASE_OUTPUT_DIR}")
+
 
 split_yolo_dataset_to_drive()
 
@@ -420,38 +438,41 @@ split_yolo_dataset_to_drive()
 
 """
 
-DATA_YAML_PATH = '/content/bottle.yaml'
-MODEL_NAME = 'yolov8n.pt'
+DATA_YAML_PATH = "/content/bottle.yaml"
+MODEL_NAME = "yolov8n.pt"
 NUM_EPOCHS = 100
 IMG_SIZE = 640
 BATCH_SIZE = 16
 
-PROJECT_NAME = 'New_yolov8n_bottle_project'
-RUN_NAME = 'caps_nano_run'
+PROJECT_NAME = "New_yolov8n_bottle_project"
+RUN_NAME = "caps_nano_run"
+
 
 def train_yolov8_model():
     """
     Menjalankan pelatihan YOLOv8n menggunakan subprocess untuk memanggil CLI.
     """
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Menggunakan perangkat: {device.upper()}")
 
     if not os.path.exists(DATA_YAML_PATH):
         print(f"❌ ERROR: File data YAML tidak ditemukan di: {DATA_YAML_PATH}")
-        print("Pastikan Anda sudah memindahkan atau membuat file bottle.yaml di lokasi /content/.")
+        print(
+            "Pastikan Anda sudah memindahkan atau membuat file bottle.yaml di lokasi /content/."
+        )
         return
 
     command = [
-        'yolo',
-        'train',
-        f'data={DATA_YAML_PATH}',
-        f'model={MODEL_NAME}',
-        f'epochs={NUM_EPOCHS}',
-        f'imgsz={IMG_SIZE}',
-        f'batch={BATCH_SIZE}',
-        f'project={PROJECT_NAME}',
-        f'name={RUN_NAME}',
-        f'device={0 if device == "cuda" else "cpu"}'
+        "yolo",
+        "train",
+        f"data={DATA_YAML_PATH}",
+        f"model={MODEL_NAME}",
+        f"epochs={NUM_EPOCHS}",
+        f"imgsz={IMG_SIZE}",
+        f"batch={BATCH_SIZE}",
+        f"project={PROJECT_NAME}",
+        f"name={RUN_NAME}",
+        f'device={0 if device == "cuda" else "cpu"}',
     ]
 
     print("\n🚀 Memulai Pelatihan YOLOv8n...")
@@ -463,7 +484,7 @@ def train_yolov8_model():
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
         )
         print("\n--- Output Pelatihan ---")
         print(process.stdout)
@@ -479,17 +500,19 @@ def train_yolov8_model():
     except Exception as e:
         print(f"\n❌ ERROR Tak Terduga: {e}")
 
+
 train_yolov8_model()
 
 """# Testing performa model yolov8n"""
 
-MODEL_WEIGHTS_PATH = '/content/New_yolov8n_bottle_project/caps_nano_run/weights/last.pt'
-SOURCE_IMAGE_DIR = '/content/drive/MyDrive/yolo_custom_dataset/images/test'
+MODEL_WEIGHTS_PATH = "/content/New_yolov8n_bottle_project/caps_nano_run/weights/last.pt"
+SOURCE_IMAGE_DIR = "/content/drive/MyDrive/yolo_custom_dataset/images/test"
 
 
 CONFIDENCE_THRESHOLD = 0.2
-PROJECT_NAME = 'New_inference_resultsv81'
-RUN_NAME = 'last_set_eval'
+PROJECT_NAME = "New_inference_resultsv81"
+RUN_NAME = "last_set_eval"
+
 
 def run_yolo_inference():
     if not os.path.exists(MODEL_WEIGHTS_PATH):
@@ -499,19 +522,21 @@ def run_yolo_inference():
 
     if not os.path.exists(SOURCE_IMAGE_DIR):
         print(f"❌ ERROR: Folder gambar sumber tidak ditemukan di: {SOURCE_IMAGE_DIR}")
-        print("Harap ganti 'SOURCE_IMAGE_DIR' dengan path yang benar ke gambar Test Set Anda.")
+        print(
+            "Harap ganti 'SOURCE_IMAGE_DIR' dengan path yang benar ke gambar Test Set Anda."
+        )
         return
 
     command = [
-        'yolo',
-        'detect',
-        'predict',
-        f'model={MODEL_WEIGHTS_PATH}',
-        f'source={SOURCE_IMAGE_DIR}',
-        f'conf={CONFIDENCE_THRESHOLD}',
-        f'project={PROJECT_NAME}',
-        f'name={RUN_NAME}',
-        'save=True'
+        "yolo",
+        "detect",
+        "predict",
+        f"model={MODEL_WEIGHTS_PATH}",
+        f"source={SOURCE_IMAGE_DIR}",
+        f"conf={CONFIDENCE_THRESHOLD}",
+        f"project={PROJECT_NAME}",
+        f"name={RUN_NAME}",
+        "save=True",
     ]
 
     print("\n🚀 Memulai Inferensi pada Test Set...")
@@ -523,14 +548,16 @@ def run_yolo_inference():
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
         )
         print("\n--- Output Inferensi ---")
         print(process.stdout)
 
         output_path = os.path.join(PROJECT_NAME, RUN_NAME)
         print(f"--------------------------")
-        print(f"\n✅ Inferensi selesai! Hasil visual (gambar ber-BB) tersimpan di folder: {output_path}")
+        print(
+            f"\n✅ Inferensi selesai! Hasil visual (gambar ber-BB) tersimpan di folder: {output_path}"
+        )
 
     except FileNotFoundError:
         print("\n❌ ERROR: Perintah 'yolo' tidak ditemukan.")
@@ -541,5 +568,5 @@ def run_yolo_inference():
     except Exception as e:
         print(f"\n❌ ERROR Tak Terduga: {e}")
 
-run_yolo_inference()
 
+run_yolo_inference()

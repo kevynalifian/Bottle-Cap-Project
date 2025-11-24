@@ -7,10 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/11DWDF8WxdsCOy2jQ_Sv55j4I4byx-ixb
 """
 
-pip install wandb
-pip install ultralytics
-
 import wandb
+
 wandb.login()
 
 import wandb
@@ -20,12 +18,7 @@ from ultralytics import YOLO
 wandb.init(
     project="New_yolov8n_bottle_project",
     name="yolov8n-colab",
-    config={
-        "model": "yolov8n",
-        "epochs": 100,
-        "batch": 16,
-        "imgsz": 640
-    }
+    config={"model": "yolov8n", "epochs": 100, "batch": 16, "imgsz": 640},
 )
 
 # Load model
