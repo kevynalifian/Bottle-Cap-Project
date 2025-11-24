@@ -7,8 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1P2g3D0RnULMRVApVD4aRrEkLR4o99e8G
 """
 
-pip install ultralytics
-
 """# IMPORT LIBRARY"""
 
 import pandas as pd
