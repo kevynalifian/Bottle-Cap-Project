@@ -1,0 +1,22 @@
+# Path dasar ke dataset
+path: /content/drive/MyDrive/yolo_custom_dataset 
+
+# --- Direktori Gambar ---
+# Path relatif ke folder gambar training (latih)
+train: images/train 
+
+# Path relatif ke folder gambar validation (validasi)
+val: images/val 
+
+# Path relatif ke folder gambar test (uji)
+test: images/test 
+
+# --- Konfigurasi Kelas ---
+# Jumlah kelas (Number of classes)
+nc: 3 
+
+# Nama-nama kelas dalam urutan indeks (0, 1, 2)
+names:
+  0: "Light Blue"
+  1: "Dark Blue"
+  2: "Others"
