@@ -1,0 +1,11 @@
+pandas
+numpy
+matplotlib
+seaborn
+
+opencv-python
+scikit-learn
+torch
+ultralytics
+
+pyyaml
