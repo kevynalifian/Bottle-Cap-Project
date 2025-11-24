@@ -10,8 +10,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # copy project files
 COPY pyproject.toml .
 COPY requirements.txt .
-COPY src/ src/
-COPY configs/ configs/
 
 # install dependencies
 RUN pip install --upgrade pip setuptools wheel
