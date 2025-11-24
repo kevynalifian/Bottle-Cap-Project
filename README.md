@@ -5,7 +5,6 @@ Saya Kevyn Alifian Hernanda Wibowo sebagai salah satu pelamar Machine Learning E
 ## Flowchart
 <img width="3138" height="1742" alt="Flowchart" src="https://github.com/user-attachments/assets/31ba9925-bb00-46b3-a353-a0535c9311d3" />
 
-﻿## Penjelasan Flowchart
 ### Penjelasan singkat dataset
 Berdasarkan dataset yang diberikan, yang berisi 12 gambar tutup botol dan file .txt berformat YOLO berisi koordinat bounding box.
 
@@ -13,7 +12,9 @@ Berdasarkan dataset yang diberikan, yang berisi 12 gambar tutup botol dan file .
 Tahapan pertama yang saya lakukan adalah re-labelling, dataset terlebih dahulu diinput kemudian dilakukan konversi warna dari RGB ke HSV untuk memudahkan proses pendeteksian warna. Selanjutnya, Region of Interest (ROI) ditentukan dengan memanfaatkan titik koordinat bounding box yang tersedia pada file .txt, sehingga area tutup botol dapat dicrop secara presisi. Setelah gambar berada pada ruang warna HSV dan telah dipotong sesuai ROI, tutup botol kemudian diklasifikasikan ulang menjadi tiga kelas, yaitu light blue, dark blue, dan others berdasarkan nilai Hue, Saturation, dan Value yang telah ditetapkan sebelumnya.Tahapan re-labelling diakhiri dengan menghasilkan file .txt label baru yang memuat kelas objek hasil klasifikasi ulang. Berikut merupakan visualisasi proses re-labelling dalam project ini.
 <img width="2207" height="1791" alt="Group 262" src="https://github.com/user-attachments/assets/edf06c83-8d0e-47a4-bee0-59c98022a6a5" />
 
+
 Kemudian dibawah ini merupakan hasil proses re-labelling.
+
 <img width="390" height="504" alt="download (3)" src="https://github.com/user-attachments/assets/b1cdd446-455f-4b30-83b3-72d63c9e3804" />
 
 ### Splitting Dataset
@@ -45,4 +46,5 @@ Berdasarkan penelitian yang telah saya lakukan, terdapat ketidakseimbangan distr
 Selain itu, tantangan lain yang ditemukan adalah kondisi pencahayaan pada dataset. Variasi intensitas cahaya yang cukup ekstrem mengakibatkan perbedaan warna yang tidak konsisten, sehingga proses relabeling berbasis HSV harus dilakukan dengan sangat hati-hati untuk menghindari kesalahan klasifikasi warna. Kondisi pencahayaan yang kurang stabil ini juga dapat memengaruhi kemampuan model dalam membedakan kelas saat proses inferensi.
 
 Secara keseluruhan, class imbalance dan kualitas pencahayaan merupakan dua faktor yang paling berpengaruh terhadap performa model, karena keduanya dapat meningkatkan risiko bias serta mengurangi kemampuan generalisasi model terhadap kelas minoritas.
+
 
