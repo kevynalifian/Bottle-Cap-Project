@@ -7,6 +7,9 @@ Original file is located at
     https://colab.research.google.com/drive/11DWDF8WxdsCOy2jQ_Sv55j4I4byx-ixb
 """
 
+pip install wandb
+pip install ultralytics
+
 import wandb
 
 wandb.login()
